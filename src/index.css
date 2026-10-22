@@ -1,0 +1,321 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Tokens de cor — claro por padrão, escuro via prefers-color-scheme
+   ------------------------------------------------------------------ */
+:root {
+  --app-bg: #f7f6fb;
+  --surface: #ffffff;
+  --surface-2: #f1eff8;
+  --ink: #1f1b2e;
+  --muted: #6b6880;
+  --line: #e4e1ee;
+  --line-strong: #d3cfe1;
+
+  /* Cores de preenchimento (fundo de botões com texto branco) — todas ≥ 4,5:1 com branco */
+  --brand: #7c4dff;
+  --brand-dark: #5b2fd6;
+  --brand-soft: #efe9ff;
+  --brand-ink: #4a22c0;
+
+  --ok: #15803d;
+  --ok-dark: #0f5f2d;
+  --ok-soft: #dcfce7;
+  --ok-ink: #166534;
+
+  --bad: #dc2626;
+  --bad-dark: #a61b1b;
+  --bad-soft: #fde7ea;
+  --bad-ink: #b0283a;
+
+  /* Dourado é claro: sempre com texto escuro (--gold-ink ou #3b2600) */
+  --gold: #ffb020;
+  --gold-dark: #d98c00;
+  --gold-soft: #fff3d6;
+  --gold-ink: #8a5800;
+
+  --fire: #c2410c;
+  --sky: #0a74b5;
+  --locked: #e3e1ea;
+  --locked-dark: #c9c6d4;
+  --locked-ink: #a19db2;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --app-bg: #13111b;
+    --surface: #1c1928;
+    --surface-2: #252136;
+    --ink: #f2f0fa;
+    --muted: #a7a3bb;
+    --line: #322d45;
+    --line-strong: #433d5a;
+
+    /* Preenchimentos continuam escuros o bastante para texto branco; os "-ink" clareiam para texto sobre o fundo escuro */
+    --brand: #7c4dff;
+    --brand-dark: #5b2fd6;
+    --brand-soft: #2a2148;
+    --brand-ink: #c7b6ff;
+
+    --ok: #15803d;
+    --ok-dark: #0f5f2d;
+    --ok-soft: #173426;
+    --ok-ink: #7be0ae;
+
+    --bad: #dc2626;
+    --bad-dark: #a61b1b;
+    --bad-soft: #3a1a22;
+    --bad-ink: #ff9aa5;
+
+    --gold: #ffbf3f;
+    --gold-dark: #c98a12;
+    --gold-soft: #3a2d12;
+    --gold-ink: #ffd27a;
+
+    --fire: #fb923c;
+    --sky: #38bdf8;
+    --locked: #2d293d;
+    --locked-dark: #221f2f;
+    --locked-ink: #6c6782;
+
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-bg: var(--app-bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+
+  --color-ok: var(--ok);
+  --color-ok-dark: var(--ok-dark);
+  --color-ok-soft: var(--ok-soft);
+  --color-ok-ink: var(--ok-ink);
+
+  --color-bad: var(--bad);
+  --color-bad-dark: var(--bad-dark);
+  --color-bad-soft: var(--bad-soft);
+  --color-bad-ink: var(--bad-ink);
+
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-gold-soft: var(--gold-soft);
+  --color-gold-ink: var(--gold-ink);
+
+  --color-fire: var(--fire);
+  --color-sky: var(--sky);
+  --color-locked: var(--locked);
+  --color-locked-dark: var(--locked-dark);
+  --color-locked-ink: var(--locked-ink);
+}
+
+html,
+body {
+  background: var(--app-bg);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* ------------------------------------------------------------------
+   Botões "3D" no estilo do app
+   ------------------------------------------------------------------ */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide select-none transition-[transform,filter,box-shadow] duration-100 disabled:cursor-not-allowed;
+    box-shadow: 0 4px 0 var(--btn-shadow, transparent);
+  }
+  .btn:not(:disabled):hover {
+    filter: brightness(1.05);
+  }
+  .btn:not(:disabled):active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 var(--btn-shadow, transparent);
+  }
+  .btn-primary {
+    @apply bg-brand text-white;
+    --btn-shadow: var(--brand-dark);
+  }
+  .btn-ok {
+    @apply bg-ok text-white;
+    --btn-shadow: var(--ok-dark);
+  }
+  .btn-bad {
+    @apply bg-bad text-white;
+    --btn-shadow: var(--bad-dark);
+  }
+  .btn-gold {
+    @apply bg-gold text-[#3b2600];
+    --btn-shadow: var(--gold-dark);
+  }
+  .btn-ghost {
+    @apply border-2 border-line bg-surface text-muted;
+    --btn-shadow: var(--line);
+  }
+  .btn-ghost:not(:disabled):hover {
+    @apply bg-surface-2;
+  }
+  .btn:disabled {
+    @apply bg-locked text-locked-ink;
+    --btn-shadow: var(--locked-dark);
+    filter: none;
+  }
+
+  .card {
+    @apply rounded-3xl border-2 border-line bg-surface;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-extrabold uppercase tracking-wide;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border-2 border-line bg-surface-2 px-4 py-3 font-semibold text-ink outline-none placeholder:text-muted/70 focus:border-brand;
+  }
+
+  /* Opção de resposta selecionável */
+  .option {
+    @apply w-full rounded-2xl border-2 border-line bg-surface px-4 py-3 text-left font-bold text-ink transition-colors;
+    box-shadow: 0 3px 0 var(--line);
+  }
+  .option:hover:not(:disabled) {
+    @apply bg-surface-2;
+  }
+  .option[data-state="selected"] {
+    @apply border-sky bg-sky/10 text-sky;
+    box-shadow: 0 3px 0 color-mix(in oklab, var(--sky) 70%, black);
+  }
+  .option[data-state="correct"] {
+    @apply border-ok bg-ok-soft text-ok-ink;
+    box-shadow: 0 3px 0 var(--ok);
+  }
+  .option[data-state="wrong"] {
+    @apply border-bad bg-bad-soft text-bad-ink;
+    box-shadow: 0 3px 0 var(--bad);
+  }
+  .option[data-state="dim"] {
+    @apply opacity-50;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Texto das lições (markdown)
+   ------------------------------------------------------------------ */
+.prose-ux {
+  @apply text-[17px] leading-relaxed text-ink;
+}
+.prose-ux > * + * {
+  @apply mt-4;
+}
+.prose-ux h1 {
+  @apply text-2xl font-black leading-tight;
+}
+.prose-ux h2 {
+  @apply text-xl font-black leading-tight;
+}
+.prose-ux h3 {
+  @apply text-lg font-extrabold;
+}
+.prose-ux strong {
+  @apply font-extrabold;
+}
+.prose-ux a {
+  @apply font-bold text-brand underline decoration-2 underline-offset-2;
+}
+.prose-ux ul {
+  @apply list-disc space-y-1.5 pl-6;
+}
+.prose-ux ol {
+  @apply list-decimal space-y-1.5 pl-6;
+}
+.prose-ux li::marker {
+  @apply text-brand;
+}
+.prose-ux blockquote {
+  @apply rounded-2xl border-2 border-brand/30 bg-brand-soft px-4 py-3 font-semibold text-ink;
+}
+.prose-ux blockquote > * + * {
+  @apply mt-2;
+}
+.prose-ux code {
+  @apply rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-[0.9em];
+}
+.prose-ux table {
+  @apply w-full border-collapse overflow-hidden rounded-2xl text-[15px];
+}
+.prose-ux th {
+  @apply border-b-2 border-line bg-surface-2 px-3 py-2 text-left font-extrabold;
+}
+.prose-ux td {
+  @apply border-b border-line px-3 py-2 align-top;
+}
+.prose-ux hr {
+  @apply border-line;
+}
+
+/* ------------------------------------------------------------------
+   Animações
+   ------------------------------------------------------------------ */
+@keyframes pop-in {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+@keyframes ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--node-color, var(--brand)) 45%, transparent); }
+  100% { box-shadow: 0 0 0 18px transparent; }
+}
+.animate-pop { animation: pop-in 0.35s ease-out both; }
+.animate-slide-up { animation: slide-up 0.25s ease-out both; }
+.animate-bob { animation: bob 2.2s ease-in-out infinite; }
+.animate-shake { animation: shake 0.4s ease-in-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop,
+  .animate-slide-up,
+  .animate-bob,
+  .animate-shake {
+    animation: none;
+  }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  html, body { background: #fff; color: #000; }
+}
