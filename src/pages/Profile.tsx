@@ -1,6 +1,7 @@
 import { Award, BookOpen, Brain, Flame, LogOut, Target } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { InstallCard } from '../components/InstallApp'
 import { ProgressBar, SectionTitle, Stat, XpIcon } from '../components/ui'
 import { XpChart } from '../components/XpChart'
 import { course } from '../content'
@@ -112,6 +113,8 @@ export default function Profile() {
           </div>
         </>
       )}
+
+      <InstallCard />
 
       <Settings key={p.id + p.daily_goal_xp + p.start_date} onSave={updateProfile} />
 

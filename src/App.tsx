@@ -1,6 +1,7 @@
 import { lazy, Suspense, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router'
 import { AppShell } from './components/AppShell'
+import { PwaUpdater } from './components/InstallApp'
 import { Mascot } from './components/Mascot'
 import { Toasts } from './components/Toasts'
 import { Spinner } from './components/ui'
@@ -62,6 +63,7 @@ export default function App() {
     <AppProvider>
       <BrowserRouter>
         <Toasts />
+        <PwaUpdater />
         <Routes>
           <Route path="/entrar" element={<Login />} />
           <Route path="/boas-vindas" element={<Protected><Onboarding /></Protected>} />

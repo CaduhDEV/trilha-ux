@@ -1,6 +1,7 @@
 import { BookOpen, Check, Lock, Trophy } from 'lucide-react'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link, useNavigate } from 'react-router'
+import { InstallBanner } from '../components/InstallApp'
 import { Mascot } from '../components/Mascot'
 import { KIND_LABEL, KindIcon, ProgressBar } from '../components/ui'
 import { course } from '../content'
@@ -19,7 +20,9 @@ export default function Learn() {
   useEffect(() => {
     if (scrolled.current || !currentId) return
     scrolled.current = true
-    document.getElementById(`node-${currentId}`)?.scrollIntoView({ block: 'center' })
+    // só rola se a etapa atual estiver fora da tela (no começo da trilha o topo, com os avisos, fica visível)
+    const node = document.getElementById(`node-${currentId}`)
+    if (node && node.getBoundingClientRect().bottom > window.innerHeight - 80) node.scrollIntoView({ block: 'center' })
   }, [currentId])
 
   useEffect(() => {
@@ -36,6 +39,7 @@ export default function Learn() {
 
   return (
     <div className="mx-auto max-w-xl">
+      <InstallBanner />
       {d.current && (
         <div className="card mb-8 flex items-center gap-3 p-4 sm:gap-4">
           <Mascot mood="happy" size={64} animated className="h-12 w-12 shrink-0 sm:h-16 sm:w-16" />

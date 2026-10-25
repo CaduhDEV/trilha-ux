@@ -18,6 +18,16 @@ projetos de portfólio e repetição espaçada.
 72 lições · 563 exercícios (9 tipos) · 311 flashcards · 24 práticas · 6 projetos · 24 checkpoints · 6 provas.
 O conteúdo fica em `src/content/` (um arquivo por semana) e é validado por `npm test`.
 
+## No celular (sem loja de apps)
+
+Em produção: **https://trilha-ux.vercel.app**. O site é um app instalável (PWA): abre em tela cheia,
+tem ícone próprio, funciona com internet ruim e se atualiza sozinho a cada deploy.
+
+- **Android (Chrome):** toque em **Instalar** no aviso da trilha, ou menu ⋮ → **Instalar app**.
+- **iPhone (Safari):** Compartilhar → **Adicionar à Tela de Início**.
+
+Login e progresso sempre vão direto ao Supabase; só os arquivos do app ficam em cache.
+
 ## Rodando
 
 ```bash
