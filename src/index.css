@@ -130,6 +130,8 @@ body {
 
 body {
   font-family: var(--font-sans);
+  /* rede de segurança: nada deve criar rolagem horizontal na página */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
@@ -226,6 +228,7 @@ body {
    ------------------------------------------------------------------ */
 .prose-ux {
   @apply text-[17px] leading-relaxed text-ink;
+  overflow-wrap: break-word;
 }
 .prose-ux > * + * {
   @apply mt-4;
@@ -301,6 +304,30 @@ body {
   0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--node-color, var(--brand)) 45%, transparent); }
   100% { box-shadow: 0 0 0 18px transparent; }
 }
+/* Olhos do mascote: as pupilas passeiam (sem sair do branco do olho) e ele pisca */
+@keyframes mascot-look {
+  0%, 16% { transform: translate(0, 0); }
+  20%, 34% { transform: translate(-3.5px, 0); }
+  38%, 52% { transform: translate(-3.5px, -1.5px); }
+  56%, 70% { transform: translate(1px, 0.5px); }
+  74%, 86% { transform: translate(-1px, 1.5px); }
+  90%, 100% { transform: translate(0, 0); }
+}
+@keyframes mascot-blink {
+  0%, 44%, 50%, 92%, 100% { transform: scaleY(1); }
+  47%, 95% { transform: scaleY(0.1); }
+}
+.mascot-live .mascot-pupil {
+  animation: mascot-look 7s ease-in-out infinite;
+  animation-delay: var(--mascot-delay, 0s);
+}
+.mascot-live .mascot-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mascot-blink 5s ease-in-out infinite;
+  animation-delay: var(--mascot-delay, 0s);
+}
+
 .animate-pop { animation: pop-in 0.35s ease-out both; }
 .animate-slide-up { animation: slide-up 0.25s ease-out both; }
 .animate-bob { animation: bob 2.2s ease-in-out infinite; }
@@ -310,7 +337,9 @@ body {
   .animate-pop,
   .animate-slide-up,
   .animate-bob,
-  .animate-shake {
+  .animate-shake,
+  .mascot-live .mascot-pupil,
+  .mascot-live .mascot-eye {
     animation: none;
   }
 }

@@ -26,21 +26,25 @@ export default function Certificate() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="no-print mb-4 flex items-center justify-between">
+      <div className="no-print mb-4 flex items-center justify-between gap-3">
         <Link to="/perfil" className="inline-flex items-center gap-1 text-sm font-extrabold uppercase text-muted hover:text-ink">
           <ArrowLeft size={18} /> Voltar
         </Link>
-        <button className="btn btn-ghost" onClick={() => window.print()}>
-          <Printer size={18} /> Imprimir / salvar PDF
+        <button className="btn btn-ghost px-3 sm:px-5" onClick={() => window.print()} aria-label="Imprimir ou salvar PDF">
+          <Printer size={18} /> <span className="hidden sm:inline">Imprimir / salvar PDF</span>
+          <span className="sm:hidden">PDF</span>
         </button>
       </div>
-      <div className="relative overflow-hidden rounded-3xl border-[6px] bg-white p-8 text-center text-[#1f1b2e] sm:p-14" style={{ borderColor: color }}>
+      <div
+        className="relative overflow-hidden break-words rounded-3xl border-[6px] bg-white px-5 py-8 text-center text-[#1f1b2e] sm:p-14"
+        style={{ borderColor: color }}
+      >
         <Mascot mood="party" size={90} className="mx-auto" />
         <div className="mt-4 text-sm font-black uppercase tracking-[0.3em]" style={{ color }}>
           Certificado de conclusão
         </div>
         <p className="mt-8 font-semibold text-[#6b6880]">Certificamos que</p>
-        <h1 className="mt-2 text-4xl font-black sm:text-5xl">{data.profile.display_name}</h1>
+        <h1 className="mt-2 text-3xl font-black sm:text-5xl">{data.profile.display_name}</h1>
         <p className="mx-auto mt-6 max-w-lg text-lg font-semibold leading-relaxed">
           {final ? (
             <>
@@ -53,7 +57,8 @@ export default function Certificate() {
             </>
           )}
         </p>
-        <div className="mx-auto mt-8 grid max-w-md grid-cols-3 gap-4 text-sm font-bold text-[#6b6880]">
+        {/* a data por extenso é longa: em telas pequenas ocupa a linha inteira */}
+        <div className="mx-auto mt-8 grid max-w-md grid-cols-2 gap-4 text-sm font-bold text-[#6b6880] sm:grid-cols-3">
           <div>
             <div className="text-2xl font-black text-[#1f1b2e]">~{hours} h</div>
             carga estimada
@@ -62,8 +67,10 @@ export default function Certificate() {
             <div className="text-2xl font-black text-[#1f1b2e]">{avg}%</div>
             {final ? 'média nas provas' : 'nota na prova'}
           </div>
-          <div>
-            <div className="text-2xl font-black text-[#1f1b2e]">{formatLong(date ? toLocalDate(new Date(date)) : toLocalDate())}</div>
+          <div className="col-span-2 sm:col-span-1">
+            <div className="text-lg font-black leading-tight text-[#1f1b2e]">
+              {formatLong(date ? toLocalDate(new Date(date)) : toLocalDate())}
+            </div>
             data
           </div>
         </div>

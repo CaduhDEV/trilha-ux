@@ -1,7 +1,7 @@
 import { X } from 'lucide-react'
 import { useEffect, type ReactNode } from 'react'
 import type { ItemKind } from '../content/types'
-import { BookOpen, ClipboardCheck, Crown, PenTool, Briefcase } from 'lucide-react'
+import { BookOpen, ClipboardCheck, Crown, PenTool, Briefcase, Star } from 'lucide-react'
 
 export function ProgressBar({
   value,
@@ -58,7 +58,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-label={label}
-        className="card animate-pop relative w-full max-w-md p-6"
+        className="card animate-pop relative max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <button className="absolute right-4 top-4 text-muted hover:text-ink" onClick={onClose} aria-label="Fechar">
@@ -94,6 +94,11 @@ export function KindIcon({ kind, size = 28 }: { kind: ItemKind; size?: number })
   }
 }
 
+/** Ícone de XP (pontos). Estrela e não raio: raio lembra "energia que se gasta" e aqui nada se gasta. */
+export function XpIcon({ size = 24, className = '' }: { size?: number; className?: string }) {
+  return <Star size={size} fill="currentColor" strokeWidth={2.2} strokeLinejoin="round" className={className} aria-hidden />
+}
+
 export function Spinner({ label = 'Carregando…' }: { label?: string }) {
   return (
     <div className="flex flex-col items-center gap-3 py-16 text-muted" role="status">
@@ -109,7 +114,7 @@ export function Stat({ icon, value, label, tone = 'text-ink' }: { icon: ReactNod
       <div className={`text-2xl ${tone}`}>{icon}</div>
       <div className="min-w-0">
         <div className="text-xl font-black leading-none">{value}</div>
-        <div className="mt-1 truncate text-sm font-bold text-muted">{label}</div>
+        <div className="mt-1 text-sm font-bold leading-tight text-muted">{label}</div>
       </div>
     </div>
   )

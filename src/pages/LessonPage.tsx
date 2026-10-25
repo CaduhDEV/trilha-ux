@@ -1,8 +1,9 @@
 import confetti from 'canvas-confetti'
-import { Brain, Clock, ExternalLink, Target, Zap } from 'lucide-react'
+import { Brain, Clock, ExternalLink, Target } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router'
 import { Mascot } from '../components/Mascot'
+import { XpIcon } from '../components/ui'
 import { Session, type SessionResult } from '../components/Session'
 import { course } from '../content'
 import type { LessonItem, Resource } from '../content/types'
@@ -85,7 +86,7 @@ function LessonComplete({
         <p className="mt-1 font-bold text-muted">{item.title}</p>
 
         <div className="mt-8 grid w-full grid-cols-3 gap-3">
-          <StatBox label="XP" value={`+${result.xp}`} tone="gold" icon={<Zap size={20} fill="currentColor" />} />
+          <StatBox label="XP" value={`+${result.xp}`} tone="gold" icon={<XpIcon size={20} />} />
           <StatBox label="Precisão" value={`${result.score}%`} tone="ok" icon={<Target size={20} />} />
           <StatBox label="Tempo" value={fmtTime(result.seconds)} tone="sky" icon={<Clock size={20} />} />
         </div>

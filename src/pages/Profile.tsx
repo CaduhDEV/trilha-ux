@@ -1,7 +1,7 @@
-import { Award, BookOpen, Brain, Flame, LogOut, Target, Zap } from 'lucide-react'
+import { Award, BookOpen, Brain, Flame, LogOut, Target } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { ProgressBar, SectionTitle, Stat } from '../components/ui'
+import { ProgressBar, SectionTitle, Stat, XpIcon } from '../components/ui'
 import { XpChart } from '../components/XpChart'
 import { course } from '../content'
 import { useData } from '../context/AppContext'
@@ -30,13 +30,18 @@ export default function Profile() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="flex items-center gap-5">
-        <div className="grid h-24 w-24 shrink-0 place-items-center rounded-full bg-brand text-3xl font-black text-white" style={{ boxShadow: '0 6px 0 var(--brand-dark)' }}>
+      <div className="flex items-center gap-4 sm:gap-5">
+        <div
+          className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-brand text-2xl font-black text-white sm:h-24 sm:w-24 sm:text-3xl"
+          style={{ boxShadow: '0 6px 0 var(--brand-dark)' }}
+        >
           {initials || '🙂'}
         </div>
-        <div className="min-w-0">
-          <h1 className="truncate text-3xl font-black">{p.display_name}</h1>
-          <div className="font-bold text-muted">{user.email}</div>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-2xl font-black sm:text-3xl">{p.display_name}</h1>
+          <div className="truncate font-bold text-muted" title={user.email ?? undefined}>
+            {user.email}
+          </div>
           <div className="mt-1 flex flex-wrap gap-2">
             <span className="chip bg-brand-soft text-brand-ink">🏅 {title}</span>
             <span className="chip bg-surface-2 text-muted">Desde {formatLong(p.created_at.slice(0, 10))}</span>
@@ -50,14 +55,14 @@ export default function Profile() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat icon={<Flame fill="currentColor" />} tone="text-fire" value={d.streak} label="dias seguidos" />
         <Stat icon={<Flame />} tone="text-gold" value={longestStreak(d.byDay)} label="recorde de dias" />
-        <Stat icon={<Zap fill="currentColor" />} tone="text-gold" value={d.totalXp} label="XP total" />
+        <Stat icon={<XpIcon />} tone="text-gold" value={d.totalXp} label="XP total" />
         <Stat icon={<BookOpen />} tone="text-brand" value={`${lessonsDone}/${lessons.length}`} label="lições" />
         <Stat icon={<Target />} tone="text-ok" value={accuracy === null ? '—' : `${accuracy}%`} label="acertos" />
         <Stat icon={<Brain />} tone="text-sky" value={reviews} label="revisões" />
       </div>
 
       <div className="card mt-4 p-5">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3">
           <span className="font-black">Nível {d.level.level}</span>
           <span className="text-sm font-bold text-muted">
             {d.totalXp - d.level.floor} / {d.level.ceil - d.level.floor} XP para o nível {d.level.level + 1}

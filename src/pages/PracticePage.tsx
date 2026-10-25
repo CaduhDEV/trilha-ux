@@ -1,9 +1,9 @@
 import confetti from 'canvas-confetti'
-import { ArrowLeft, Check, Clock, ListChecks, MessageSquare, Send, Zap } from 'lucide-react'
+import { ArrowLeft, Check, Clock, ListChecks, MessageSquare, Send } from 'lucide-react'
 import { useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router'
 import { Markdown } from '../components/Markdown'
-import { KIND_LABEL } from '../components/ui'
+import { KIND_LABEL, XpIcon } from '../components/ui'
 import { course } from '../content'
 import type { PracticeItem, PracticeTool } from '../content/types'
 import { useData } from '../context/AppContext'
@@ -74,11 +74,11 @@ function Practice({ item }: { item: PracticeItem }) {
         <div className="flex flex-wrap items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-white/85">
           <span>{KIND_LABEL[item.kind]}</span>·<span>{TOOL[def.tool].icon} {TOOL[def.tool].label}</span>·
           <span className="flex items-center gap-1">
-            <Clock size={14} /> ~{Math.round(def.minutes / 60) >= 1 ? `${Math.round((def.minutes / 60) * 10) / 10} h` : `${def.minutes} min`}
+            <Clock size={14} /> ~{def.minutes >= 60 ? `${Math.round((def.minutes / 60) * 10) / 10} h` : `${def.minutes} min`}
           </span>
           ·
           <span className="flex items-center gap-1">
-            <Zap size={14} fill="currentColor" /> {item.xp} XP
+            <XpIcon size={14} /> {item.xp} XP
           </span>
         </div>
         <h1 className="mt-2 text-2xl font-black leading-tight">{item.title}</h1>
@@ -97,7 +97,7 @@ function Practice({ item }: { item: PracticeItem }) {
           {sub?.mentor_feedback && (
             <div className="mt-2 flex gap-2 font-semibold">
               <MessageSquare size={18} className="mt-1 shrink-0" />
-              <p className="whitespace-pre-wrap">{sub.mentor_feedback}</p>
+              <p className="min-w-0 whitespace-pre-wrap break-words">{sub.mentor_feedback}</p>
             </div>
           )}
         </div>

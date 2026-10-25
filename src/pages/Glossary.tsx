@@ -40,7 +40,7 @@ export default function Glossary() {
       <h1 className="text-3xl font-black">Glossário de UX</h1>
       <p className="mt-1 font-semibold text-muted">{entries.length} termos que você vai dominar ao longo da trilha.</p>
 
-      <div className="sticky top-16 z-10 -mx-4 mt-6 bg-bg px-4 py-2 lg:top-0">
+      <div className="sticky top-[58px] z-10 -mx-4 mt-6 bg-bg px-4 py-2 lg:top-0">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
           <input className="field pl-12" placeholder="Buscar termo…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar termo" />

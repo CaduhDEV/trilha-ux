@@ -158,7 +158,8 @@ export function Session({ itemId, steps, feedback, requeue, timeLimitMin, onExit
   const progress = feedback === 'deferred' ? answered / Math.max(total, 1) : pos / queue.length
   const isCard = entry.step.kind === 'card'
   const ex = entry.step.kind === 'exercise' ? entry.step.exercise : null
-  const correctText = ex && checked && !checked.correct ? correctAnswerText(ex) : null
+  // no "ligar pares" a correção já aparece em cada cartão; repetir a lista no rodapé só polui
+  const correctText = ex && checked && !checked.correct && ex.type !== 'match' ? correctAnswerText(ex) : null
   const explanation = ex && checked ? explanationOf(ex) : null
 
   return (
@@ -205,7 +206,7 @@ export function Session({ itemId, steps, feedback, requeue, timeLimitMin, onExit
             : 'border-line bg-bg'
         }`}
       >
-        <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center">
+        <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:flex-row sm:items-center">
           {checked && ex && (
             <div className="flex flex-1 gap-3">
               {ex.type === 'open' ? (
@@ -223,7 +224,9 @@ export function Session({ itemId, steps, feedback, requeue, timeLimitMin, onExit
                       ? checked.praise
                       : correctText
                         ? 'Resposta correta:'
-                        : 'Quase! Vale revisar este ponto.'}
+                        : ex.type === 'match'
+                          ? 'Alguns pares não batem. Veja a correção nos cartões.'
+                          : 'Quase! Vale revisar este ponto.'}
                 </div>
                 {correctText && <div className="font-extrabold text-bad-ink">{correctText}</div>}
                 {explanation && (

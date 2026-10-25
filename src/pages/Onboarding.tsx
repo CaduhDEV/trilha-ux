@@ -38,6 +38,9 @@ export default function Onboarding() {
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && name.trim() && setStep(1)}
+          enterKeyHint="next"
+          autoComplete="given-name"
           placeholder="Seu nome"
         />
       ),
@@ -72,11 +75,11 @@ export default function Onboarding() {
               data-state={goal === g.xp ? 'selected' : undefined}
               onClick={() => setGoal(g.xp)}
             >
-              <span>
+              <span className="min-w-0">
                 <span className="font-black">{g.label}</span>
-                <span className="ml-2 text-sm font-semibold opacity-75">{g.hint}</span>
+                <span className="block text-sm font-semibold opacity-75 sm:ml-2 sm:inline">{g.hint}</span>
               </span>
-              <span className="text-sm">{g.minutes}</span>
+              <span className="shrink-0 pl-3 text-sm">{g.minutes}</span>
             </button>
           ))}
         </div>
@@ -108,7 +111,7 @@ export default function Onboarding() {
           </div>
           <p className="rounded-2xl bg-brand-soft p-4 font-semibold">
             São <b>{totalWeeks} semanas</b> de conteúdo + 2 de folga. Começando em {formatLong(start)}, a previsão de formatura é{' '}
-            <b>{formatLong(addDays(start, (totalWeeks + 2) * 7))}</b>.
+            <b>{formatLong(addDays(start, (totalWeeks + 2) * 7 - 1))}</b>.
           </p>
         </div>
       ),
@@ -173,7 +176,7 @@ export default function Onboarding() {
           <button className="btn btn-ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
             Voltar
           </button>
-          <button className="btn btn-ok min-w-40" onClick={next} disabled={!s.valid}>
+          <button className="btn btn-ok flex-1 sm:max-w-60 sm:flex-none sm:min-w-40" onClick={next} disabled={!s.valid}>
             {last ? 'Começar a trilha' : 'Continuar'}
           </button>
         </div>

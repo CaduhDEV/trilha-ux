@@ -37,15 +37,15 @@ export default function Learn() {
   return (
     <div className="mx-auto max-w-xl">
       {d.current && (
-        <div className="card mb-8 flex items-center gap-4 p-4">
-          <Mascot mood="happy" size={64} className="shrink-0" />
+        <div className="card mb-8 flex items-center gap-3 p-4 sm:gap-4">
+          <Mascot mood="happy" size={64} animated className="h-12 w-12 shrink-0 sm:h-16 sm:w-16" />
           <div className="min-w-0 flex-1">
             <div className="text-sm font-extrabold text-muted">
               {d.doneToday ? `Boa, ${first}! Bora mais um?` : `Oi, ${first}! Seu próximo passo:`}
             </div>
             <div className="truncate text-lg font-black">{d.current.title}</div>
           </div>
-          <Link to={itemHref(d.current)} className="btn btn-ok shrink-0">
+          <Link to={itemHref(d.current)} className="btn btn-ok shrink-0 px-4 sm:px-5">
             Continuar
           </Link>
         </div>
@@ -148,7 +148,7 @@ function UnitSection({
   return (
     <div className="mb-10">
       <div
-        className="sticky top-16 z-10 mb-8 flex items-center justify-between gap-3 rounded-2xl px-5 py-3.5 text-white lg:top-4"
+        className="sticky top-[66px] z-10 mb-14 flex items-center justify-between gap-3 rounded-2xl px-5 py-3.5 text-white lg:top-4"
         style={{ background: m.color, boxShadow: `0 4px 0 ${m.colorDark}` }}
       >
         <div className="min-w-0">
@@ -171,6 +171,7 @@ function UnitSection({
         <Mascot
           mood={allDone ? 'party' : 'think'}
           size={88}
+          animated
           className={`pointer-events-none absolute top-24 hidden opacity-90 sm:block ${mascotSide === 'right' ? 'right-2' : 'left-2'}`}
         />
       </div>
@@ -206,7 +207,13 @@ function PathNode({
   const shadow = done ? (gold ? 'var(--gold-dark)' : m.colorDark) : unlocked ? m.colorDark : 'var(--locked-dark)'
 
   return (
-    <div id={`node-${item.id}`} data-node className="relative flex flex-col items-center" style={{ transform: `translateX(${offset}px)` }}>
+    <div
+      id={`node-${item.id}`}
+      data-node
+      className="relative flex flex-col items-center"
+      // aberto, o nó sobe acima dos vizinhos e dos cabeçalhos fixos para o balão não ficar por baixo
+      style={{ transform: `translateX(${offset}px)`, zIndex: open ? 20 : undefined }}
+    >
       {current && !open && (
         <div
           className="animate-bob absolute -top-11 z-[5] whitespace-nowrap rounded-xl border-2 border-line bg-surface px-3 py-1.5 text-sm font-black uppercase"

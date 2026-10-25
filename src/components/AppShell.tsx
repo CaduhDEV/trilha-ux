@@ -1,10 +1,10 @@
-import { Brain, CalendarDays, Flame, House, Library, User, Users, Zap } from 'lucide-react'
+import { Brain, CalendarDays, Flame, House, Library, User, Users } from 'lucide-react'
 import { NavLink, Outlet, Link } from 'react-router'
 import { useData } from '../context/AppContext'
 import { course } from '../content'
 import { store } from '../lib/store'
 import { Mascot } from './Mascot'
-import { ProgressBar } from './ui'
+import { ProgressBar, XpIcon } from './ui'
 
 function useNav() {
   const { data, d } = useData()
@@ -41,12 +41,16 @@ export function AppShell() {
                 }`
               }
             >
-              <Icon size={26} strokeWidth={2.3} />
+              <Icon size={26} strokeWidth={2.3} className="shrink-0" />
               <span className="flex-1">{label}</span>
               {badge ? <span className="chip bg-bad text-white">{badge}</span> : null}
             </NavLink>
           ))}
         </nav>
+        {/* Entre lg e xl a coluna da direita some; sem isso sequência e XP ficariam invisíveis */}
+        <div className="mt-6 flex justify-center rounded-2xl border-2 border-line py-2.5 xl:hidden">
+          <TopStats />
+        </div>
         {store.mode === 'demo' && (
           <div className="mt-auto rounded-2xl bg-gold-soft p-3 text-xs font-bold text-gold-ink">
             Modo demonstração: o progresso fica salvo só neste navegador. Configure o Supabase para usar de verdade.
@@ -84,11 +88,11 @@ export function AppShell() {
               end={end}
               aria-label={label}
               className={({ isActive }) =>
-                `relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-extrabold ${isActive ? 'text-sky' : 'text-muted'}`
+                `relative flex min-w-0 flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-extrabold ${isActive ? 'text-sky' : 'text-muted'}`
               }
             >
               <Icon size={24} strokeWidth={2.3} />
-              {label}
+              <span className="max-w-full truncate">{label}</span>
               {badge ? (
                 <span className="absolute right-[22%] top-1 rounded-full bg-bad px-1.5 text-[10px] font-black text-white">
                   {badge}
@@ -102,16 +106,34 @@ export function AppShell() {
   )
 }
 
+/** Explica a sequência no tooltip/leitor de tela — o ícone sozinho não diz o que é */
+function streakHint(streak: number, doneToday: boolean) {
+  const days = `${streak} ${streak === 1 ? 'dia seguido' : 'dias seguidos'} de estudo`
+  return doneToday ? `${days}. Hoje já conta!` : `${days}. Estude hoje para manter a sequência.`
+}
+
+/** Sequência 🔥 e XP ⚡ com rótulo visível ("3 dias", "120 XP") */
 function TopStats() {
   const { d } = useData()
   return (
     <div className="flex items-center gap-4 font-black">
-      <span className={`flex items-center gap-1 ${d.doneToday ? 'text-fire' : 'text-locked-ink'}`} title="Dias seguidos">
-        <Flame size={22} fill="currentColor" /> {d.streak}
-      </span>
-      <span className="flex items-center gap-1 text-gold-ink" title="XP total">
-        <Zap size={22} fill="currentColor" /> {d.totalXp}
-      </span>
+      <Link
+        to="/perfil"
+        className={`flex items-center gap-1 ${d.doneToday ? 'text-fire' : 'text-locked-ink'}`}
+        title={streakHint(d.streak, d.doneToday)}
+        aria-label={streakHint(d.streak, d.doneToday)}
+      >
+        <Flame size={20} fill="currentColor" className="shrink-0" />
+        <span className="whitespace-nowrap">
+          {d.streak} <span className="text-xs font-extrabold">{d.streak === 1 ? 'dia' : 'dias'}</span>
+        </span>
+      </Link>
+      <Link to="/perfil" className="flex items-center gap-1 text-gold-ink" title="XP total: pontos ganhos estudando" aria-label={`${d.totalXp} XP no total`}>
+        <XpIcon size={20} className="shrink-0" />
+        <span className="whitespace-nowrap">
+          {d.totalXp} <span className="text-xs font-extrabold">XP</span>
+        </span>
+      </Link>
     </div>
   )
 }
@@ -125,18 +147,29 @@ function RightRail() {
 
   return (
     <aside className="sticky top-6 hidden h-fit w-80 shrink-0 flex-col gap-4 xl:flex">
-      <div className="flex items-center justify-around rounded-3xl border-2 border-line px-3 py-3 font-black">
-        <span className={`flex items-center gap-1.5 ${d.doneToday ? 'text-fire' : 'text-locked-ink'}`} title="Dias seguidos">
-          <Flame size={24} fill="currentColor" /> {d.streak}
-        </span>
-        <span className="flex items-center gap-1.5 text-gold-ink" title="XP total">
-          <Zap size={24} fill="currentColor" /> {d.totalXp}
-        </span>
-        <span className="flex items-center gap-1.5 text-brand-ink" title="Nível">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand text-sm text-white">{d.level.level}</span>
-          nível
-        </span>
+      <div className="grid grid-cols-3 rounded-3xl border-2 border-line px-2 py-3 text-center">
+        <div className={d.doneToday ? 'text-fire' : 'text-locked-ink'} title={streakHint(d.streak, d.doneToday)}>
+          <div className="flex items-center justify-center gap-1 text-lg font-black">
+            <Flame size={22} fill="currentColor" /> {d.streak}
+          </div>
+          <div className="text-[11px] font-extrabold uppercase text-muted">{d.streak === 1 ? 'dia seguido' : 'dias seguidos'}</div>
+        </div>
+        <div className="text-gold-ink" title="Pontos ganhos estudando">
+          <div className="flex items-center justify-center gap-1 text-lg font-black">
+            <XpIcon size={22} /> {d.totalXp}
+          </div>
+          <div className="text-[11px] font-extrabold uppercase text-muted">XP total</div>
+        </div>
+        <div className="text-brand-ink">
+          <div className="flex items-center justify-center text-lg font-black">
+            <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand text-sm text-white">{d.level.level}</span>
+          </div>
+          <div className="text-[11px] font-extrabold uppercase text-muted">nível</div>
+        </div>
       </div>
+      {!d.doneToday && d.streak > 0 && (
+        <p className="-mt-2 text-center text-xs font-bold text-muted">Estude hoje para não perder a sequência de {d.streak} 🔥</p>
+      )}
 
       <div className="card p-5">
         <div className="mb-3 flex items-center justify-between">
@@ -146,7 +179,7 @@ function RightRail() {
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          <Zap size={34} className="shrink-0 text-gold" fill="currentColor" />
+          <XpIcon size={34} className="shrink-0 text-gold" />
           <div className="flex-1">
             <ProgressBar value={d.todayXp / goal} color="var(--gold)" />
             <div className="mt-1.5 text-sm font-bold text-muted">

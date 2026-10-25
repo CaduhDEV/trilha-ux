@@ -1,8 +1,9 @@
 import confetti from 'canvas-confetti'
-import { CircleCheck, Target, Zap } from 'lucide-react'
+import { CircleCheck, Target } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router'
 import { Mascot } from '../components/Mascot'
+import { XpIcon } from '../components/ui'
 import { Session, type SessionResult } from '../components/Session'
 import { course } from '../content'
 import type { Exercise, Step } from '../content/types'
@@ -43,7 +44,7 @@ export default function Training() {
           <div className="mt-8 grid grid-cols-3 gap-3">
             <StatBox label="Retenção" value={`${score}%`} tone="ok" icon={<Target size={20} />} />
             <StatBox label="Acertos" value={`${result.firstTryCorrect}/${result.total}`} tone="sky" icon={<CircleCheck size={20} />} />
-            <StatBox label="XP" value={`+${result.xp}`} tone="gold" icon={<Zap size={20} fill="currentColor" />} />
+            <StatBox label="XP" value={`+${result.xp}`} tone="gold" icon={<XpIcon size={20} />} />
           </div>
           <ReviewList entries={result.review} />
         </main>

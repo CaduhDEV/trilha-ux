@@ -1,9 +1,9 @@
 import confetti from 'canvas-confetti'
-import { X, Zap } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { X } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 import { Mascot } from '../components/Mascot'
-import { ProgressBar } from '../components/ui'
+import { ProgressBar, XpIcon } from '../components/ui'
 import { course } from '../content'
 import { useData } from '../context/AppContext'
 import { shuffle } from '../lib/random'
@@ -34,6 +34,7 @@ export default function Flashcards() {
   const [reviewed, setReviewed] = useState(0)
   const [retried] = useState(() => new Set<string>())
   const [finished, setFinished] = useState(false)
+  const rating = useRef(false)
 
   const cardId = queue[pos]
   const fc = cardId ? course.flashcardById.get(cardId) : null
@@ -41,7 +42,17 @@ export default function Flashcards() {
   const lesson = fc ? course.byId.get(fc.lessonId) : null
 
   const rate = async (g: Grade) => {
-    if (!cardId) return
+    // evita avaliar o mesmo cartão duas vezes com toque duplo ou tecla repetida
+    if (!cardId || rating.current) return
+    rating.current = true
+    try {
+      await rateCard(cardId, g)
+    } finally {
+      rating.current = false
+    }
+  }
+
+  const rateCard = async (cardId: string, g: Grade) => {
     await reviewCard(cardId, g)
     setReviewed((n) => n + 1)
     let q = queue
@@ -77,10 +88,10 @@ export default function Flashcards() {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-center">
         <Mascot mood={reviewed ? 'party' : 'happy'} size={120} />
-        <h1 className="text-3xl font-black">{reviewed ? 'Revisão concluída!' : 'Nada para revisar agora'}</h1>
+        <h1 className="text-2xl font-black sm:text-3xl">{reviewed ? 'Revisão concluída!' : 'Nada para revisar agora'}</h1>
         {reviewed > 0 && (
           <p className="flex items-center gap-1 text-lg font-black text-gold-ink">
-            <Zap fill="currentColor" /> +{reviewed} XP · {reviewed} cartões
+            <XpIcon /> +{reviewed} XP · {reviewed} {reviewed === 1 ? 'cartão' : 'cartões'}
           </p>
         )}
         <p className="max-w-sm font-semibold text-muted">
@@ -106,7 +117,7 @@ export default function Flashcards() {
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-4 py-8">
         <div className="mb-3 text-center text-xs font-extrabold uppercase tracking-wide text-muted">{lesson?.title}</div>
         <button
-          className="card relative min-h-72 w-full p-8 text-center transition-transform"
+          className="card relative min-h-72 w-full p-6 text-center transition-transform sm:p-8"
           onClick={() => setFlipped(true)}
           aria-label={flipped ? 'Resposta' : 'Mostrar resposta'}
         >

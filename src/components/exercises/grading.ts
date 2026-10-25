@@ -6,7 +6,8 @@ export type Answer =
   | { type: 'multi'; choices: string[] }
   | { type: 'tf'; value: boolean }
   | { type: 'fill'; choice: string }
-  | { type: 'match'; mistakes: number }
+  /** pares ligados pela pessoa: [texto da esquerda, texto da direita] */
+  | { type: 'match'; pairs: [string, string][] }
   | { type: 'order'; sequence: string[] }
   | { type: 'contrast'; passes: boolean }
   | { type: 'ab'; choice: 'a' | 'b' }
@@ -27,7 +28,12 @@ export function grade(ex: Exercise, a: Answer): boolean {
     case 'tf':
       return a.type === 'tf' && a.value === ex.answer
     case 'match':
-      return a.type === 'match' && a.mistakes <= 1
+      // certo só se todos os pares estiverem certos (a direita pode repetir, então compara pelo texto)
+      return (
+        a.type === 'match' &&
+        a.pairs.length === ex.pairs.length &&
+        a.pairs.every(([l, r]) => ex.pairs.some(([el, er]) => el === l && er === r))
+      )
     case 'order':
       return a.type === 'order' && a.sequence.join('\u0000') === ex.items.join('\u0000')
     case 'contrast':
@@ -57,6 +63,7 @@ export function correctAnswerText(ex: Exercise): string | null {
     case 'ab':
       return `Opção ${ex.correct.toUpperCase()}`
     case 'match':
+      return ex.pairs.map(([l, r]) => `${l} → ${r}`).join(' · ')
     case 'open':
       return null
   }

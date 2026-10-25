@@ -252,78 +252,124 @@ function FillBlank({ ex, checked, onChange }: Props<'fill'>) {
   )
 }
 
+/** Cor de cada par ligado (antes da correção). Sem verde/vermelho/azul para não confundir com certo/errado/selecionado. */
+const PAIR_COLORS = ['#7C4DFF', '#B45309', '#D1306F', '#0F766E', '#475569']
+
+interface PairLink {
+  /** índice em ex.pairs do cartão da esquerda */
+  l: number
+  /** índice em ex.pairs do cartão da direita */
+  r: number
+  /** cor/número do par */
+  slot: number
+}
+
 /**
- * Ligar pares. Trabalha com índices porque o lado direito pode repetir valores
- * (ex.: classificar vários itens como "Qualitativa"): qualquer cartão com o
- * texto certo serve.
+ * Ligar pares. A pessoa liga tudo livremente (pode desfazer e trocar) e só
+ * descobre o resultado ao verificar, como nos outros exercícios. Trabalha com
+ * índices porque o lado direito pode repetir valores (ex.: classificar vários
+ * itens como "Qualitativa"): qualquer cartão com o texto certo serve.
  */
 function MatchPairs({ ex, checked, onChange }: Props<'match'>) {
   const lefts = useMemo(() => shuffle(ex.pairs.map((_, i) => i)), [ex])
   const rights = useMemo(() => shuffle(ex.pairs.map((_, i) => i)), [ex])
-  const [left, setLeft] = useState<number | null>(null)
-  const [right, setRight] = useState<number | null>(null)
-  const [done, setDone] = useState<Set<string>>(new Set())
-  const [flash, setFlash] = useState<string[]>([])
-  const mistakes = useRef(0)
+  const [links, setLinks] = useState<PairLink[]>([])
+  const [sel, setSel] = useState<{ side: 'L' | 'R'; i: number } | null>(null)
+  const total = ex.pairs.length
+  const isRight = (k: PairLink) => ex.pairs[k.l][1] === ex.pairs[k.r][1]
 
-  const attempt = (l: number | null, r: number | null) => {
-    if (l === null || r === null) return
-    if (ex.pairs[l][1] === ex.pairs[r][1]) {
-      const next = new Set(done).add(`L${l}`).add(`R${r}`)
-      setDone(next)
-      if (next.size === ex.pairs.length * 2) onChange({ type: 'match', mistakes: mistakes.current })
+  const commit = (next: PairLink[]) => {
+    setLinks(next)
+    onChange(
+      next.length === total
+        ? { type: 'match', pairs: next.map((k) => [ex.pairs[k.l][0], ex.pairs[k.r][1]] as [string, string]) }
+        : null,
+    )
+  }
+
+  const tap = (side: 'L' | 'R', i: number) => {
+    if (checked) return
+    const linked = links.find((k) => (side === 'L' ? k.l : k.r) === i)
+    const rest = linked ? links.filter((k) => k !== linked) : links
+    if (sel && sel.side !== side) {
+      // completa o par com o item já selecionado (se este já tinha par, troca)
+      const used = new Set(rest.map((k) => k.slot))
+      let slot = linked?.slot ?? 0
+      while (!linked && used.has(slot)) slot++
+      commit([...rest, { l: side === 'L' ? i : sel.i, r: side === 'R' ? i : sel.i, slot }])
+      setSel(null)
+    } else if (linked) {
+      // tocar num par desfaz a ligação e deixa o item pronto para religar
+      commit(rest)
+      setSel({ side, i })
     } else {
-      mistakes.current += 1
-      setFlash([`L${l}`, `R${r}`])
-      setTimeout(() => setFlash([]), 500)
+      setSel(sel?.side === side && sel.i === i ? null : { side, i })
     }
-    setLeft(null)
-    setRight(null)
   }
 
-  const cls = (key: string, selected: boolean): OptState => {
-    if (done.has(key)) return checked ? 'correct' : 'dim'
-    if (flash.includes(key)) return 'wrong'
-    return selected ? 'selected' : undefined
+  const card = (side: 'L' | 'R', i: number) => {
+    const link = links.find((k) => (side === 'L' ? k.l : k.r) === i)
+    const color = link ? PAIR_COLORS[link.slot % PAIR_COLORS.length] : undefined
+    const ok = link ? isRight(link) : false
+    const selected = sel?.side === side && sel.i === i
+    const text = side === 'L' ? ex.pairs[i][0] : ex.pairs[i][1]
+    const state: OptState = checked ? (ok ? 'correct' : 'wrong') : selected ? 'selected' : undefined
+    return (
+      <button
+        key={`${side}${i}`}
+        className={`option flex min-h-14 items-center gap-2 ${side === 'L' ? 'text-[15px]' : 'text-sm font-semibold'}`}
+        data-state={state}
+        style={
+          !checked && link
+            ? {
+                borderColor: color,
+                background: `color-mix(in oklab, ${color} 14%, var(--surface))`,
+                boxShadow: `0 3px 0 ${color}`,
+              }
+            : undefined
+        }
+        aria-pressed={selected || !!link}
+        aria-label={`${text}${link ? `, par ${link.slot + 1}` : ''}${checked ? (ok ? ', certo' : ', errado') : ''}`}
+        onClick={() => tap(side, i)}
+        disabled={checked}
+      >
+        {link && (
+          <span
+            className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-black text-white"
+            style={{ background: checked ? (ok ? 'var(--ok)' : 'var(--bad)') : color }}
+            aria-hidden
+          >
+            {/* o número continua após verificar para mostrar o que foi ligado com o quê */}
+            {link.slot + 1}
+          </span>
+        )}
+        <span className="min-w-0 flex-1">
+          {text}
+          {checked && side === 'L' && link && !ok && (
+            <span className="mt-1 block text-xs font-extrabold">Par certo: {ex.pairs[i][1]}</span>
+          )}
+        </span>
+      </button>
+    )
   }
 
+  const hits = links.filter(isRight).length
   return (
     <>
       <Prompt kicker="Ligue os pares">{ex.prompt}</Prompt>
       <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-3">
-          {lefts.map((i) => (
-            <button
-              key={`L${i}`}
-              className={`option min-h-14 text-[15px] ${flash.includes(`L${i}`) ? 'animate-shake' : ''}`}
-              data-state={cls(`L${i}`, left === i)}
-              disabled={done.has(`L${i}`) || checked}
-              onClick={() => {
-                setLeft(i)
-                attempt(i, right)
-              }}
-            >
-              {ex.pairs[i][0]}
-            </button>
-          ))}
-        </div>
-        <div className="flex flex-col gap-3">
-          {rights.map((i) => (
-            <button
-              key={`R${i}`}
-              className={`option min-h-14 text-sm font-semibold ${flash.includes(`R${i}`) ? 'animate-shake' : ''}`}
-              data-state={cls(`R${i}`, right === i)}
-              disabled={done.has(`R${i}`) || checked}
-              onClick={() => {
-                setRight(i)
-                attempt(left, i)
-              }}
-            >
-              {ex.pairs[i][1]}
-            </button>
-          ))}
-        </div>
+        <div className="flex flex-col gap-3">{lefts.map((i) => card('L', i))}</div>
+        <div className="flex flex-col gap-3">{rights.map((i) => card('R', i))}</div>
       </div>
+      <p className="mt-4 text-center text-sm font-bold text-muted" aria-live="polite">
+        {checked
+          ? `${hits} de ${total} pares certos`
+          : links.length === 0
+            ? 'Toque num item de um lado e depois no par dele do outro lado.'
+            : links.length < total
+              ? `${links.length} de ${total} pares ligados · toque num par para desfazer`
+              : 'Tudo ligado! Confira e toque em Verificar.'}
+      </p>
     </>
   )
 }
@@ -401,7 +447,13 @@ function ContrastQuestion({ ex, checked, onChange }: Props<'contrast'>) {
       </p>
       <div className="grid grid-cols-2 gap-3">
         {[true, false].map((v, i) => (
-          <button key={String(v)} className="option text-center" data-state={state(v)} onClick={() => choose(v)} disabled={checked}>
+          <button
+            key={String(v)}
+            className="option flex items-center justify-center gap-3"
+            data-state={state(v)}
+            onClick={() => choose(v)}
+            disabled={checked}
+          >
             {v ? 'Passa' : 'Não passa'} <Key n={i + 1} />
           </button>
         ))}

@@ -1,13 +1,33 @@
 // "Pixel", o mascote da Trilha UX — um frame do Figma com olhos.
-import type { ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 
 export type Mood = 'happy' | 'think' | 'party' | 'sad' | 'wink'
 
-export function Mascot({ mood = 'happy', size = 96, className = '' }: { mood?: Mood; size?: number; className?: string }) {
+export function Mascot({
+  mood = 'happy',
+  size = 96,
+  className = '',
+  animated = false,
+}: {
+  mood?: Mood
+  size?: number
+  className?: string
+  /** olhos vivos: as pupilas olham em volta e ele pisca de vez em quando */
+  animated?: boolean
+}) {
+  // atraso aleatório para vários mascotes na tela não piscarem em sincronia
+  const [delay] = useState(() => `${(-Math.random() * 7).toFixed(2)}s`)
   const eyeY = mood === 'think' ? 25 : 27
   const pupilDx = mood === 'think' ? 2.5 : 1.5
   return (
-    <svg viewBox="0 0 64 64" width={size} height={size} className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 64 64"
+      width={size}
+      height={size}
+      className={`${animated ? 'mascot-live' : ''} ${className}`}
+      style={animated ? ({ '--mascot-delay': delay } as CSSProperties) : undefined}
+      aria-hidden="true"
+    >
       {mood === 'party' && (
         <g>
           <path d="M14 4 l3 6 M50 3 l-3 6 M6 16 l6 2 M58 16 l-6 2" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round" />
@@ -21,13 +41,15 @@ export function Mascot({ mood = 'happy', size = 96, className = '' }: { mood?: M
       {mood === 'wink' ? (
         <path d="M17 28 q6 -5 12 0" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" fill="none" />
       ) : (
-        <>
+        <g className="mascot-eye">
           <circle cx="23" cy={eyeY} r="7" fill="#fff" />
-          <circle cx={23 + pupilDx} cy={eyeY + (mood === 'sad' ? 1.5 : 1)} r="3.3" fill="#1f1b2e" />
-        </>
+          <circle className="mascot-pupil" cx={23 + pupilDx} cy={eyeY + (mood === 'sad' ? 1.5 : 1)} r="3.3" fill="#1f1b2e" />
+        </g>
       )}
-      <circle cx="41" cy={eyeY} r="7" fill="#fff" />
-      <circle cx={41 + pupilDx} cy={eyeY + (mood === 'sad' ? 1.5 : 1)} r="3.3" fill="#1f1b2e" />
+      <g className="mascot-eye">
+        <circle cx="41" cy={eyeY} r="7" fill="#fff" />
+        <circle className="mascot-pupil" cx={41 + pupilDx} cy={eyeY + (mood === 'sad' ? 1.5 : 1)} r="3.3" fill="#1f1b2e" />
+      </g>
       {mood === 'sad' && (
         <>
           <path d="M16 18 l9 3 M48 18 l-9 3" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" />

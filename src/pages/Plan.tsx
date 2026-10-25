@@ -33,7 +33,7 @@ export default function Plan() {
     <div className="mx-auto max-w-3xl">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black">Plano de estudos</h1>
+          <h1 className="text-2xl font-black sm:text-3xl">Plano de estudos</h1>
           <p className="mt-1 font-semibold text-muted">
             {formatLong(start)} → {formatLong(end)} · {course.units.length} semanas de conteúdo + 2 de folga
           </p>
@@ -43,7 +43,7 @@ export default function Plan() {
         </button>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
         <div className="card p-4">
           <div className="text-xs font-extrabold uppercase text-muted">Semana do calendário</div>
           <div className="text-3xl font-black">{Math.min(weekNow, 26)}<span className="text-lg text-muted">/26</span></div>
@@ -52,7 +52,7 @@ export default function Plan() {
           <div className="text-xs font-extrabold uppercase text-muted">Você está na semana</div>
           <div className="text-3xl font-black">{Math.min(currentWeek, course.units.length)}<span className="text-lg text-muted">/{course.units.length}</span></div>
         </div>
-        <div className={`card p-4 ${diff >= 0 ? 'border-ok' : diff >= -1 ? 'border-gold' : 'border-bad'}`}>
+        <div className={`card col-span-2 p-4 sm:col-span-1 ${diff >= 0 ? 'border-ok' : diff >= -1 ? 'border-gold' : 'border-bad'}`}>
           <div className="text-xs font-extrabold uppercase text-muted">Ritmo</div>
           <div className={`text-xl font-black ${diff >= 0 ? 'text-ok-ink' : diff >= -1 ? 'text-gold-ink' : 'text-bad-ink'}`}>
             {diff > 0 ? `Adiantada(o) ${diff} sem.` : diff === 0 ? 'No ritmo certo ✓' : `${-diff} sem. atrás`}
@@ -179,7 +179,7 @@ function ItemList({ ids }: { ids: string[] }) {
               {done ? <Check size={16} strokeWidth={3.5} /> : unlocked ? <KindIcon kind={item.kind} size={16} /> : <Lock size={14} />}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate font-bold">{item.title}</span>
+              <span className="block font-bold leading-snug">{item.title}</span>
               <span className="block text-xs font-bold text-muted">
                 {KIND_LABEL[item.kind]} · {item.minutes >= 60 ? `${Math.round(item.minutes / 6) / 10} h` : `${item.minutes} min`}
               </span>

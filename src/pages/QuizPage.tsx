@@ -1,9 +1,10 @@
 import confetti from 'canvas-confetti'
-import { CircleCheck, CircleX, ClipboardCheck, Crown, Target, Timer, Zap } from 'lucide-react'
+import { CircleCheck, CircleX, ClipboardCheck, Crown, Target, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router'
 import { correctAnswerText, explanationOf, promptOf, type Answer } from '../components/exercises/grading'
 import { Mascot } from '../components/Mascot'
+import { XpIcon } from '../components/ui'
 import { Session, type ReviewEntry, type SessionResult } from '../components/Session'
 import { course } from '../content'
 import type { QuizItem, Step } from '../content/types'
@@ -82,7 +83,7 @@ function Quiz({ item }: { item: QuizItem }) {
           <div className="mt-8 grid grid-cols-3 gap-3">
             <StatBox label="Nota" value={`${result.score}%`} tone={result.passed ? 'ok' : 'bad'} icon={<Target size={20} />} />
             <StatBox label="Acertos" value={`${result.firstTryCorrect}/${result.total}`} tone="sky" icon={<CircleCheck size={20} />} />
-            <StatBox label="XP" value={`+${result.xp}`} tone="gold" icon={<Zap size={20} fill="currentColor" />} />
+            <StatBox label="XP" value={`+${result.xp}`} tone="gold" icon={<XpIcon size={20} />} />
           </div>
 
           <ReviewList entries={result.review} />
@@ -185,7 +186,7 @@ function describe(a: Answer | null): string {
     case 'ab':
       return `Opção ${a.choice.toUpperCase()}`
     case 'match':
-      return `${a.mistakes} erro(s) ao ligar`
+      return a.pairs.map(([l, r]) => `${l} → ${r}`).join(' · ')
     case 'open':
       return a.text
   }

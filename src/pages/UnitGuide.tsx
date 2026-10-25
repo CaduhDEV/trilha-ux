@@ -1,4 +1,4 @@
-import { ArrowLeft, ChevronDown } from 'lucide-react'
+import { ArrowLeft, ChevronDown, Lock } from 'lucide-react'
 import { useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router'
 import { Markdown } from '../components/Markdown'
@@ -40,26 +40,38 @@ export default function UnitGuide() {
         {unit.items.map((item) => {
           const done = d.completed.has(item.id)
           const unlocked = d.isUnlocked(item.id)
+          const inner = (
+            <>
+              <span
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full"
+                style={{
+                  background: done ? 'var(--ok)' : unlocked ? mod.color : 'var(--locked)',
+                  color: done || unlocked ? '#fff' : 'var(--locked-ink)',
+                }}
+              >
+                {unlocked ? <KindIcon kind={item.kind} size={20} /> : <Lock size={18} />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-black">{item.title}</span>
+                <span className="block text-sm font-semibold text-muted">
+                  {KIND_LABEL[item.kind]} · {item.summary}
+                </span>
+              </span>
+              {done && <span className="chip shrink-0 bg-ok-soft text-ok-ink">feito</span>}
+            </>
+          )
           return (
             <li key={item.id}>
-              <Link
-                to={unlocked ? itemHref(item) : '#'}
-                className={`flex items-center gap-3 p-4 ${unlocked ? 'hover:bg-surface-2' : 'pointer-events-none opacity-60'}`}
-              >
-                <span
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-white"
-                  style={{ background: done ? 'var(--ok)' : unlocked ? mod.color : 'var(--locked)' }}
-                >
-                  <KindIcon kind={item.kind} size={20} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block font-black">{item.title}</span>
-                  <span className="block text-sm font-semibold text-muted">
-                    {KIND_LABEL[item.kind]} · {item.summary}
-                  </span>
-                </span>
-                {done && <span className="chip bg-ok-soft text-ok-ink">feito</span>}
-              </Link>
+              {/* etapa bloqueada não é link: antes era um <a href="#"> que ainda recebia foco pelo teclado */}
+              {unlocked ? (
+                <Link to={itemHref(item)} className="flex items-center gap-3 p-4 hover:bg-surface-2">
+                  {inner}
+                </Link>
+              ) : (
+                <div className="flex items-center gap-3 p-4 opacity-60">
+                  {inner}
+                </div>
+              )}
             </li>
           )
         })}

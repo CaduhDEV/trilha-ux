@@ -36,7 +36,13 @@ export function XpChart({ byDay, goal, days = 14 }: { byDay: Map<string, number>
                 aria-label={`${formatShort(s.date)}: ${s.xp} XP`}
               >
                 {hover === i && (
-                  <div className="pointer-events-none absolute z-10 whitespace-nowrap rounded-lg bg-ink px-2 py-1 text-xs font-bold text-surface" style={{ bottom: 32 + (s.xp / max) * H }}>
+                  <div
+                    className={`pointer-events-none absolute z-10 whitespace-nowrap rounded-lg bg-ink px-2 py-1 text-xs font-bold text-surface ${
+                      // ancora nas pontas para o balão não vazar do gráfico
+                      i < days / 3 ? 'left-0' : i >= (2 * days) / 3 ? 'right-0' : 'left-1/2 -translate-x-1/2'
+                    }`}
+                    style={{ bottom: 32 + (s.xp / max) * H }}
+                  >
                     {weekdayShort(s.date)}, {formatShort(s.date)} · {s.xp} XP
                   </div>
                 )}
@@ -52,7 +58,8 @@ export function XpChart({ byDay, goal, days = 14 }: { byDay: Map<string, number>
                   }}
                 />
                 <span className={`mt-1.5 h-[18px] text-[10px] font-extrabold uppercase ${isToday ? 'text-ink' : 'text-muted'}`}>
-                  {weekdayShort(s.date).slice(0, 3)}
+                  <span className="sm:hidden">{weekdayShort(s.date).slice(0, 1)}</span>
+                  <span className="hidden sm:inline">{weekdayShort(s.date).slice(0, 3)}</span>
                 </span>
               </div>
             )

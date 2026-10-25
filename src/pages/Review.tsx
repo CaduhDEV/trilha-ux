@@ -63,8 +63,11 @@ export default function Review() {
             to="/revisar/cartoes"
             className={`btn flex-1 ${d.dueCards.length ? 'btn-primary' : 'btn-ghost pointer-events-none opacity-60'}`}
             aria-disabled={!d.dueCards.length}
+            tabIndex={d.dueCards.length ? undefined : -1}
           >
-            {d.dueCards.length ? `Revisar ${d.dueCards.length} cartões` : 'Nada para hoje 🎉'}
+            {d.dueCards.length
+              ? `Revisar ${d.dueCards.length} ${d.dueCards.length === 1 ? 'cartão' : 'cartões'}`
+              : 'Nada para hoje 🎉'}
           </Link>
           {cards.length > 0 && (
             <Link to="/revisar/cartoes?adiantar=1" className="btn btn-ghost flex-1">
@@ -91,7 +94,7 @@ export default function Review() {
             <div className="mb-2 text-sm font-extrabold uppercase tracking-wide text-muted">Seus pontos de atenção</div>
             <ul className="flex flex-col gap-2">
               {weakest.map(({ item, n }) => (
-                <li key={item.id} className="flex items-center justify-between rounded-xl bg-surface-2 px-3 py-2 font-bold">
+                <li key={item.id} className="flex items-center justify-between gap-3 rounded-xl bg-surface-2 px-3 py-2 font-bold">
                   <span className="truncate">{item.title}</span>
                   <span className="chip shrink-0 bg-bad-soft text-bad-ink">{n} erro{n > 1 ? 's' : ''}</span>
                 </li>
@@ -103,6 +106,7 @@ export default function Review() {
           to="/revisar/treino"
           className={`btn mt-5 w-full ${lessonsDone ? 'btn-ok' : 'btn-ghost pointer-events-none opacity-60'}`}
           aria-disabled={!lessonsDone}
+          tabIndex={lessonsDone ? undefined : -1}
         >
           {lessonsDone ? 'Começar treino (+10 XP)' : 'Conclua uma lição primeiro'}
         </Link>
@@ -116,12 +120,12 @@ export default function Review() {
             const mine = cards.filter((c) => ids.has(c.card_id))
             const strong = mine.filter((c) => c.interval_days >= 7).length
             return (
-              <div key={m.id} className="flex items-center gap-4 p-4">
-                <div className="w-28 shrink-0 text-sm font-black sm:w-44">
+              <div key={m.id} className="flex items-center gap-3 p-4 sm:gap-4">
+                <div className="w-28 shrink-0 text-sm font-black leading-tight sm:w-44">
                   <span style={{ color: m.color }}>M{m.number}</span> {m.title}
                 </div>
                 <ProgressBar value={mine.length ? strong / mine.length : 0} color={m.color} height={12} />
-                <span className="w-16 shrink-0 text-right text-sm font-bold text-muted">
+                <span className="w-12 shrink-0 text-right text-sm font-bold text-muted sm:w-16">
                   {mine.length ? `${strong}/${mine.length}` : '—'}
                 </span>
               </div>

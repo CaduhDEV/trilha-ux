@@ -92,11 +92,11 @@ export default function Mentor() {
                       const n = m.items.filter((i) => done.has(i.id)).length
                       return (
                         <div key={m.id} className="flex items-center gap-3 py-1.5">
-                          <span className="w-40 shrink-0 truncate text-sm font-black">
+                          <span className="w-28 shrink-0 truncate text-sm font-black sm:w-40">
                             M{m.number} · {m.title}
                           </span>
                           <ProgressBar value={n / m.items.length} color={m.color} height={10} />
-                          <span className="w-14 shrink-0 text-right text-xs font-bold text-muted">
+                          <span className="w-10 shrink-0 text-right text-xs font-bold text-muted sm:w-14">
                             {n}/{m.items.length}
                           </span>
                         </div>
@@ -173,7 +173,7 @@ function SubmissionCard({ sub, onDone }: { sub: SubmissionForReview; onDone: () 
   return (
     <div className="card p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
+        <div className="min-w-0">
           <div className="text-xs font-extrabold uppercase text-muted">{sub.display_name}</div>
           <div className="text-lg font-black">{item?.title ?? sub.practice_id}</div>
         </div>
@@ -184,7 +184,7 @@ function SubmissionCard({ sub, onDone }: { sub: SubmissionForReview; onDone: () 
           Abrir entrega <ExternalLink size={16} />
         </a>
       )}
-      {sub.notes && <p className="mt-3 whitespace-pre-wrap rounded-xl bg-surface-2 p-3 font-semibold">“{sub.notes}”</p>}
+      {sub.notes && <p className="mt-3 whitespace-pre-wrap break-words rounded-xl bg-surface-2 p-3 font-semibold">“{sub.notes}”</p>}
       {item && (
         <details className="mt-3">
           <summary className="cursor-pointer text-sm font-extrabold uppercase text-muted">
@@ -205,7 +205,7 @@ function SubmissionCard({ sub, onDone }: { sub: SubmissionForReview; onDone: () 
         value={feedback}
         onChange={(e) => setFeedback(e.target.value)}
       />
-      <div className="mt-3 flex gap-3">
+      <div className="mt-3 flex flex-col gap-3 sm:flex-row">
         <button className="btn btn-gold flex-1" disabled={busy} onClick={() => send('refazer')}>
           <RotateCcw size={18} /> Pedir ajustes
         </button>
