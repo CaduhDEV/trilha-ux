@@ -7,9 +7,9 @@ import { Mascot } from '../components/Mascot'
 import { XpIcon } from '../components/ui'
 import { Session, type ReviewEntry, type SessionResult } from '../components/Session'
 import { course } from '../content'
+import { buildQuiz } from '../content/quizVariants'
 import type { QuizItem, Step } from '../content/types'
 import { useData } from '../context/AppContext'
-import { weightedSample } from '../lib/random'
 import { StatBox } from './LessonPage'
 
 type Phase = 'intro' | 'running' | 'result'
@@ -35,7 +35,7 @@ function Quiz({ item }: { item: QuizItem }) {
 
   const steps: Step[] = useMemo(
     () =>
-      weightedSample(item.pool, item.questionCount, (e) => 1 + 2 * (d.misses.get(e.id) ?? 0)).map((exercise) => ({
+      buildQuiz(item.pool, item.questionCount, (e) => 1 + 2 * (d.misses.get(e.id) ?? 0)).map((exercise) => ({
         kind: 'exercise' as const,
         exercise,
       })),
@@ -150,7 +150,7 @@ function Quiz({ item }: { item: QuizItem }) {
           )}
         </ul>
         <p className="mt-4 text-sm font-semibold text-muted">
-          As questões são sorteadas do banco do {exam ? 'módulo' : 'conteúdo da semana'}, com mais chance para os temas em que você já errou.
+          As questões são sorteadas do banco do {exam ? 'módulo' : 'conteúdo da semana'}, com mais chance para os temas em que você já errou. Parte delas pede para julgar várias afirmações de uma vez — só vale se acertar todas.
         </p>
       </main>
       <footer className="border-t-2 border-line">

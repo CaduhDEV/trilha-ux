@@ -1,6 +1,6 @@
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import type { AuthUser, DataStore } from '.'
-import type { ItemProgress, Profile, StudentOverview, Submission, SubmissionForReview, UserData } from '../types'
+import type { ItemProgress, Profile, StudentOverview, Submission, SubmissionFile, SubmissionForReview, UserData } from '../types'
 
 const toUser = (u: User | null | undefined): AuthUser | null => (u ? { id: u.id, email: u.email ?? null } : null)
 
@@ -21,6 +21,7 @@ function translate(msg: string): string {
 }
 
 const PAGE = 1000
+const BUCKET = 'entregas'
 
 /** Busca todas as linhas, paginando de 1000 em 1000 */
 async function all<T>(query: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>) {
@@ -99,7 +100,7 @@ export function supabaseStore(sb: SupabaseClient): DataStore {
           .from('exercise_attempts')
           .select('exercise_id,correct')
           .eq('user_id', userId)
-          .order('created_at', { ascending: false })
+          .order('id', { ascending: false })
           .limit(3000)
           .then(check<UserData['attempts']>),
       ])
@@ -137,6 +138,21 @@ export function supabaseStore(sb: SupabaseClient): DataStore {
       return check(
         await sb.from('submissions').upsert(payload, { onConflict: 'user_id,practice_id' }).select('*').single<Submission>(),
       )
+    },
+
+    async uploadFile(userId, practiceId, file) {
+      const safe = file.name.normalize('NFD').replace(/[^w.-]+/g, '_').slice(-80)
+      const path = `${userId}/${practiceId}/${crypto.randomUUID()}-${safe}`
+      check(await sb.storage.from(BUCKET).upload(path, file, { contentType: file.type || undefined }))
+      return { path, name: file.name, size: file.size, type: file.type } satisfies SubmissionFile
+    },
+
+    async removeFile(path) {
+      check(await sb.storage.from(BUCKET).remove([path]))
+    },
+
+    async fileUrl(path) {
+      return check(await sb.storage.from(BUCKET).createSignedUrl(path, 60 * 60)).signedUrl
     },
 
     async unlockAchievements(userId, list) {

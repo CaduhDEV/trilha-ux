@@ -126,7 +126,13 @@ function derive(data: UserData): Derived {
     .map((m) => m.number)
 
   const misses = new Map<string, number>()
-  for (const a of data.attempts) if (!a.correct) misses.set(a.exercise_id, (misses.get(a.exercise_id) ?? 0) + 1)
+  // Erros pendentes: só os que vieram depois do último acerto (attempts está do mais novo ao mais antigo)
+  const settled = new Set<string>()
+  for (const a of data.attempts) {
+    if (settled.has(a.exercise_id)) continue
+    if (a.correct) settled.add(a.exercise_id)
+    else misses.set(a.exercise_id, (misses.get(a.exercise_id) ?? 0) + 1)
+  }
 
   return {
     progress,
@@ -254,7 +260,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (!user || !attempts.length) return
       mutate((p) => ({
         ...p,
-        attempts: [...attempts.map((a) => ({ exercise_id: a.exercise_id, correct: a.correct })), ...p.attempts].slice(0, 3000),
+        attempts: [...[...attempts].reverse().map((a) => ({ exercise_id: a.exercise_id, correct: a.correct })), ...p.attempts].slice(0, 3000),
       }))
       void persist(store.addAttempts(user.id, attempts))
     },
@@ -339,6 +345,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const prev = dataRef.current?.submissions.find((s) => s.practice_id === item.id)
       const optimistic: Submission = {
         link: null,
+        files: [],
         notes: null,
         rubric: [],
         steps_done: [],

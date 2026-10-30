@@ -120,7 +120,7 @@ export function localStore(): DataStore {
 
     async addAttempts(_id, list) {
       const d = data()
-      d.attempts = [...list.map((a) => ({ exercise_id: a.exercise_id, correct: a.correct })), ...d.attempts].slice(0, 3000)
+      d.attempts = [...[...list].reverse().map((a) => ({ exercise_id: a.exercise_id, correct: a.correct })), ...d.attempts].slice(0, 3000)
       write()
     },
 
@@ -137,6 +137,7 @@ export function localStore(): DataStore {
       const prev = d.submissions.find((x) => x.practice_id === s.practice_id)
       const next: Submission = {
         link: null,
+        files: [],
         notes: null,
         rubric: [],
         steps_done: [],
@@ -153,6 +154,24 @@ export function localStore(): DataStore {
       d.submissions = [...d.submissions.filter((x) => x.practice_id !== s.practice_id), next]
       write()
       return { ...next }
+    },
+
+    async uploadFile(_id, _practiceId, file) {
+      // demonstração: guarda o arquivo no próprio navegador (data URL)
+      if (file.size > 2 * 1024 * 1024) throw new Error('No modo demonstração o limite é 2 MB por arquivo.')
+      const path = await new Promise<string>((ok, fail) => {
+        const r = new FileReader()
+        r.onload = () => ok(r.result as string)
+        r.onerror = () => fail(new Error('Não foi possível ler o arquivo.'))
+        r.readAsDataURL(file)
+      })
+      return { path, name: file.name, size: file.size, type: file.type }
+    },
+
+    async removeFile() {},
+
+    async fileUrl(path) {
+      return path
     },
 
     async unlockAchievements(_id, list) {

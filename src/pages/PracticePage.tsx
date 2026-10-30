@@ -2,11 +2,14 @@ import confetti from 'canvas-confetti'
 import { ArrowLeft, Check, Clock, ListChecks, MessageSquare, Send } from 'lucide-react'
 import { useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router'
+import { AttachmentPicker } from '../components/Attachments'
 import { Markdown } from '../components/Markdown'
 import { KIND_LABEL, XpIcon } from '../components/ui'
 import { course } from '../content'
 import type { PracticeItem, PracticeTool } from '../content/types'
 import { useData } from '../context/AppContext'
+import { store } from '../lib/store'
+import type { SubmissionFile } from '../lib/types'
 import { ResourceList } from './LessonPage'
 
 const TOOL: Record<PracticeTool, { label: string; icon: string }> = {
@@ -28,11 +31,11 @@ export default function PracticePage() {
 }
 
 function Practice({ item }: { item: PracticeItem }) {
-  const { d, saveSubmission, notify } = useData()
+  const { d, user, saveSubmission, notify } = useData()
   const sub = d.submissions.get(item.id)
   const def = item.def
   const mod = course.moduleById.get(item.moduleId)!
-  const [link, setLink] = useState(sub?.link ?? '')
+  const [files, setFiles] = useState<SubmissionFile[]>(sub?.files ?? [])
   const [notes, setNotes] = useState(sub?.notes ?? '')
   const [rubric, setRubric] = useState<boolean[]>(() => def.rubric.map((_, i) => !!sub?.rubric?.[i]))
   const [steps, setSteps] = useState<boolean[]>(() => def.steps.map((_, i) => !!sub?.steps_done?.[i]))
@@ -45,13 +48,32 @@ function Practice({ item }: { item: PracticeItem }) {
     void saveSubmission(item, { steps_done: next }).catch(() => undefined)
   }
 
+  // os anexos sobem na hora e ficam salvos no rascunho; o envio só muda o status
+  const upload = async (list: File[]) => {
+    if (!user) return
+    let next = files
+    for (const f of list) {
+      next = [...next, await store.uploadFile(user.id, item.id, f)]
+      setFiles(next)
+    }
+    await saveSubmission(item, { files: next })
+  }
+
+  const remove = (f: SubmissionFile) => {
+    const next = files.filter((x) => x.path !== f.path)
+    setFiles(next)
+    void saveSubmission(item, { files: next })
+      .then(() => store.removeFile(f.path))
+      .catch(() => undefined)
+  }
+
   const rubricOk = rubric.filter(Boolean).length
-  const canSubmit = link.trim().length > 0 && rubricOk >= Math.ceil(def.rubric.length * 0.6)
+  const canSubmit = files.length > 0 && rubricOk >= Math.ceil(def.rubric.length * 0.6)
 
   async function submit() {
     setBusy(true)
     try {
-      const { xp } = await saveSubmission(item, { link: link.trim(), notes: notes.trim() || null, rubric, steps_done: steps }, true)
+      const { xp } = await saveSubmission(item, { files, notes: notes.trim() || null, rubric, steps_done: steps }, true)
       if (xp) {
         confetti({ particleCount: 140, spread: 80, origin: { y: 0.7 } })
         notify({ kind: 'xp', title: `Entrega enviada! +${xp} XP`, icon: '🎉' })
@@ -182,16 +204,10 @@ function Practice({ item }: { item: PracticeItem }) {
           ))}
         </div>
 
-        <h3 className="mb-2 mt-6 font-black">Link da entrega</h3>
-        <input
-          className="field"
-          type="url"
-          placeholder="https://www.figma.com/design/…"
-          value={link}
-          onChange={(e) => setLink(e.target.value)}
-        />
+        <h3 className="mb-2 mt-6 font-black">Arquivos da entrega</h3>
+        <AttachmentPicker files={files} onUpload={upload} onRemove={remove} />
         <p className="mt-1 text-xs font-semibold text-muted">
-          No Figma: Compartilhar → "Qualquer pessoa com o link pode ver" → Copiar link. Também vale Google Drive, Notion ou foto.
+          No Figma: selecione os frames → Exportar como PNG ou PDF. Fotos do papel também valem.
         </p>
 
         <h3 className="mb-2 mt-5 font-black">O que você aprendeu / dúvidas (opcional)</h3>

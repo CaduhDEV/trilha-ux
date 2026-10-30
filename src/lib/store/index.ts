@@ -8,6 +8,7 @@ import type {
   SrsCard,
   StudentOverview,
   Submission,
+  SubmissionFile,
   SubmissionForReview,
   SubmissionStatus,
   UnlockedAchievement,
@@ -42,6 +43,10 @@ export interface DataStore {
   addAttempts(userId: string, list: Attempt[]): Promise<void>
   upsertCards(userId: string, cards: SrsCard[]): Promise<void>
   saveSubmission(userId: string, s: Partial<Submission> & { practice_id: string }): Promise<Submission>
+  uploadFile(userId: string, practiceId: string, file: File): Promise<SubmissionFile>
+  removeFile(path: string): Promise<void>
+  /** URL temporária para abrir/baixar um anexo */
+  fileUrl(path: string): Promise<string>
   unlockAchievements(userId: string, list: UnlockedAchievement[]): Promise<void>
 
   // Mentor(a)

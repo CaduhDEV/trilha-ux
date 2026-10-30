@@ -56,11 +56,20 @@ export interface SrsCard {
 
 export type SubmissionStatus = 'rascunho' | 'enviado' | 'aprovado' | 'refazer'
 
+export interface SubmissionFile {
+  /** caminho no bucket "entregas" (ou data URL no modo demonstração) */
+  path: string
+  name: string
+  size: number
+  type: string
+}
+
 export interface Submission {
   id?: string
   user_id?: string
   practice_id: string
   link: string | null
+  files: SubmissionFile[]
   notes: string | null
   rubric: boolean[]
   steps_done: boolean[]

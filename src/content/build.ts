@@ -152,7 +152,7 @@ export function buildCourse(defs: ModuleDef[]): Course {
       xp: XP.exam,
       pool: examPool,
       questionCount: Math.min(mdef.cumulativeExam ? 40 : 25, examPool.length),
-      passScore: 70,
+      passScore: 75,
       timeLimitMin: mdef.cumulativeExam ? 60 : 35,
     }
     const project: PracticeItem = {

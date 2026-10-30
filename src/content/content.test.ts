@@ -1,5 +1,6 @@
 // Verificações de consistência do conteúdo do curso.
 // Rode com: npm test
+import { buildQuiz } from './quizVariants'
 import { describe, expect, it } from 'vitest'
 import { DIAGRAMS } from '../components/diagrams'
 import { course } from '.'
@@ -136,5 +137,20 @@ describe('glossário', () => {
       else seen.set(k, f.lessonId)
     }
     expect(dups).toEqual([])
+  })
+})
+
+describe('buildQuiz', () => {
+  it('gera o número pedido de questões, com "julgue" sempre tendo ao menos uma correta', () => {
+    for (const item of course.items) {
+      if (item.kind !== 'checkpoint' && item.kind !== 'exam') continue
+      for (let round = 0; round < 5; round++) {
+        const qs = buildQuiz(item.pool, item.questionCount, () => 1)
+        expect(qs.length).toBeLessThanOrEqual(item.questionCount)
+        expect(qs.length).toBeGreaterThanOrEqual(Math.min(item.questionCount, 5))
+        expect(new Set(qs.map((q) => q.id)).size).toBe(qs.length)
+        for (const q of qs) if (q.type === 'multi') expect(q.correct.length).toBeGreaterThan(0)
+      }
+    }
   })
 })

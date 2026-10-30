@@ -1,6 +1,7 @@
 import { CircleCheck, ExternalLink, RotateCcw } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { Navigate } from 'react-router'
+import { FileRow } from '../components/Attachments'
 import { MascotSays } from '../components/Mascot'
 import { ProgressBar, SectionTitle, Spinner } from '../components/ui'
 import { course } from '../content'
@@ -179,6 +180,13 @@ function SubmissionCard({ sub, onDone }: { sub: SubmissionForReview; onDone: () 
         </div>
         <span className={`chip ${badge[sub.status]}`}>{sub.status}</span>
       </div>
+      {(sub.files ?? []).length > 0 && (
+        <ul className="mt-3 flex flex-col gap-2">
+          {sub.files.map((f) => (
+            <FileRow key={f.path} file={f} />
+          ))}
+        </ul>
+      )}
       {sub.link && (
         <a href={sub.link} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 font-bold text-sky underline">
           Abrir entrega <ExternalLink size={16} />

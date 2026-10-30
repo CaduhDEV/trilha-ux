@@ -1,4 +1,4 @@
-import { BookOpen, CircleCheck, CircleX, Timer, X } from 'lucide-react'
+import { ArrowLeft, BookOpen, CircleCheck, CircleX, Timer, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Exercise, Step } from '../content/types'
 import type { Attempt } from '../lib/types'
@@ -103,6 +103,12 @@ export function Session({ itemId, steps, feedback, requeue, timeLimitMin, onExit
     if (pos + 1 >= queue.length) finish()
     else setPos(pos + 1)
   }, [pos, queue.length, finish])
+
+  // Só dá para voltar entre cartões de teoria; exercícios seguem só para frente
+  const canGoBack = entry?.step.kind === 'card' && pos > 0 && queue[pos - 1].step.kind === 'card'
+  const back = () => {
+    if (canGoBack) setPos(pos - 1)
+  }
 
   const record = (ex: Exercise, a: Answer, correct: boolean) => {
     attempts.current.push({
@@ -242,6 +248,11 @@ export function Session({ itemId, steps, feedback, requeue, timeLimitMin, onExit
             </div>
           )}
           {!checked && <div className="hidden flex-1 sm:block" />}
+          {canGoBack && (
+            <button className="btn btn-ghost w-full sm:w-44" onClick={back}>
+              <ArrowLeft size={18} /> Voltar
+            </button>
+          )}
           <button
             className={`btn w-full sm:w-44 ${
               checked ? (checked.correct || ex?.type === 'open' ? 'btn-ok' : 'btn-bad') : isCard ? 'btn-primary' : 'btn-ok'
